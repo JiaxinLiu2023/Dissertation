@@ -1,0 +1,69 @@
+*Import Panel Data
+import excel "C:\Users\ljx\Desktop\data.xlsx", sheet("Sheet1") firstrow
+xtset Code Year
+*Descriptive Statistics
+asdoc summarize
+*Main Regression
+reghdfe CEI GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m1
+reghdfe Ginn_P GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m2
+reghdfe CEI Ginn_P EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m3
+reghdfe CEI Ginn_P GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m4
+reg2docx m1 m2 m3 m4 using " Main Regression.docx", replace b(%9.3f) t(%9.3f) scalars(N r2 F) title("Main Regression ") note("***p<0.01, **p<0.05, *p<0.10")
+*Robustness Test
+*Changing The Dependent Variable
+reghdfe CE GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m1
+reghdfe Ginn_P GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m2
+reghdfe CE Ginn_P EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m3
+reghdfe CE Ginn_P GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m4
+reg2docx m1 m2 m3 m4 using " Changing The Dependent Variable.docx", replace b(%9.3f) t(%9.3f) scalars(N r2 F) title("Changing The Dependent Variable ") note("***p<0.01, **p<0.05, *p<0.10")
+* Changing The Control Variable
+reghdfe CEI GI UL IS ESE Gov EC LO WL , absorb( Code Year )
+est store m1
+reghdfe Ginn_P GI UL IS ESE Gov EC LO WL , absorb( Code Year )
+est store m2
+reghdfe CEI Ginn_P UL IS ESE Gov EC LO WL , absorb( Code Year )
+est store m3
+reghdfe CEI Ginn_P GI UL IS ESE Gov EC LO WL , absorb( Code Year )
+est store m4
+reg2docx m1 m2 m3 m4 using "Changing The Control Variable.docx", replace b(%9.3f) t(%9.3f) scalars(N r2 F) title("Changing The Control Variable") note("***p<0.01, **p<0.05, *p<0.10")
+*Changing The Mediating Variable
+reghdfe CEI GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m1
+reghdfe Ginn_log GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m2
+reghdfe CEI Ginn_log EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m3
+reghdfe CEI Ginn_log GI EDL PD ESE Gov EC LO WL , absorb( Code Year )
+est store m4
+reg2docx m1 m2 m3 m4 using " Changing The Mediating Variable.docx", replace b(%9.3f) t(%9.3f) scalars(N r2 F) title("Changing The Mediating Variable ") note("***p<0.01, **p<0.05, *p<0.10")
+*Heterogeneity Analysis
+reghdfe Ginn_P GI EDL PD ESE Gov EC LO WL , absorb( Code Year ) , if Region==1
+est store m1
+reghdfe CEI GI EDL PD ESE Gov EC LO WL , absorb( Code Year ) , if Region==1
+est store m2
+reghdfe Ginn_P GI EDL PD ESE Gov EC LO WL , absorb( Code Year ) , if Region==2
+est store m3
+reghdfe CEI GI EDL PD ESE Gov EC LO WL , absorb( Code Year ) , if Region==2
+est store m4
+reghdfe Ginn_P GI EDL PD ESE Gov EC LO WL , absorb( Code Year ) , if Region==3
+est store m5
+reghdfe CEI GI EDL PD ESE Gov EC LO WL , absorb( Code Year ) , if Region==3
+est store m6
+reghdfe Ginn_P GI EDL PD ESE Gov EC LO WL , absorb( Code Year ) , if Region==4
+est store m7
+reghdfe CEI GI EDL PD ESE Gov EC LO WL , absorb( Code Year ) , if Region==4
+est store m8
+reg2docx m1 m2 m3 m4 m5 m6 m7 m8 using " Heterogeneity Analysis.docx", replace b(%9.3f) t(%9.3f) scalars(N r2 F) title("Heterogeneity Analysis ") note("***p<0.01, **p<0.05, *p<0.10")
+*Plot
+reghdfe CEI GI EDL PD ESE Gov EC LO WL, absorb(Code Year) residuals(resid_var)
+predict fitted, xb
+twoway (scatter fitted GI)(scatter CEI GI)
+twoway scatter resid_var GI
